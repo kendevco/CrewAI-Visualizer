@@ -1,0 +1,12 @@
+export const agentTools = {
+  DUCK_DUCK_GO_SEARCH: 'DUCK_DUCK_GO_SEARCH',
+  SEMANTIC_SCHOLER: 'SEMANTIC_SCHOLER',
+  WIKIDATA: 'WIKIDATA',
+  WIKIPEDIA: 'WIKIPEDIA',
+  YAHOO_FINANCE: 'YAHOO_FINANCE',
+  YUOUTUBE_SEARCH: 'YUOUTUBE_SEARCH',
+  ARXIV: 'ARXIV',
+  PUBMED: 'PUBMED',
+} as const;
+
+export const agentToolsArray = Object.values(agentTools);

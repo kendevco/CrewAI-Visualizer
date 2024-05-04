@@ -6,19 +6,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-enum AgentTool {
-  DUCK_DUCK_GO_SEARCH
-  SEMANTIC_SCHOLER
-  WIKIDATA
-  WIKIPEDIA
-  YAHOO_FINANCE
-  YUOUTUBE_SEARCH
-  ARXIV
-  PUBMED
+model AgentTool {
+  id    Int    @id @default(autoincrement())
+  tool  String @unique
+  agent Agent  @relation(fields: [agentId], references: [id])
+  agentId Int
 }
 
 model Agent {
@@ -26,8 +22,8 @@ model Agent {
   role            String
   goal            String
   backstory       String?
-  tools           AgentTool[] @default([])
-  allowDelegation Boolean     @default(false)
+  tools           AgentTool[] // This is now a relation
+  allowDelegation Boolean @default(false)
   verbose         Boolean     @default(false)
   memory          Boolean     @default(false)
   image           String?
@@ -47,11 +43,18 @@ model Mission {
   id      Int            @id @default(autoincrement())
   name    String
   crew    Agent[]
-  tasks   Json[]         @default([])
+  tasks   Task[]         // This is now a relation
   verbose Boolean        @default(false)
   process MissionProcess @default(SEQUENTIAL)
   result  String         @default("")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Task {
+  id        Int     @id @default(autoincrement())
+  task      Json
+  mission   Mission @relation(fields: [missionId], references: [id])
+  missionId Int
 }

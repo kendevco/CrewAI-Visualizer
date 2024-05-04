@@ -13,7 +13,14 @@ export function runMission(id) {
     .then(async function (pymodule) {
       const mission = await prisma.mission.findFirst({
         where: { id },
-        include: { crew: true },
+        include: { 
+          crew: {
+            include: {
+              tools: true, // Include the tools of each crew member
+            },
+          },
+          tasks: true, // Include the tasks of the mission
+        },
       });
       if (mission) {
         const { result, error, message } = await py.call(
@@ -29,7 +36,7 @@ export function runMission(id) {
         }
         return { result, error, message };
       } else {
-        throw Error("Mission doest not exist");
+        throw Error("Mission does not exist");
       }
     })
     .catch((err) => console.log(err));

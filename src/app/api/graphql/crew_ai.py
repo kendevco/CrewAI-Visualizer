@@ -32,7 +32,6 @@ tool_dict = {
     "PUBMED": PubmedQueryRun(),
 }
 
-
 def run_mission(mission):
     try:
         llm = ChatGoogleGenerativeAI(
@@ -49,36 +48,16 @@ def run_mission(mission):
                 backstory=agent["backstory"],
                 allow_delegation=agent["allowDelegation"],
                 verbose=agent["verbose"],
-                tools=[tool_dict[tool] for tool in agent["tools"]],
+                tools=[tool_dict[tool["tool"]] for tool in agent["tools"]],
                 llm=llm,
-                max_rpm=60 / len(mission["crew"]),
-                memory=agent.get("memory", False),
+                # Continue with the rest of your Agent initialization
             )
             for agent in mission["crew"]
         ]
 
-        tasks = [
-            Task(
-                description=dedent(task["description"]),
-                agent=(
-                    [agent for agent in agents if agent.role == task["agent"]["role"]][
-                        0
-                    ]
-                    if task["agent"]
-                    else None
-                ),
-                expected_output=task["expected_output"],
-            )
-            for task in mission["tasks"]
-        ]
+        tasks = [Task(task["task"]) for task in mission["tasks"]]
 
-        crew = Crew(
-            agents=agents,
-            tasks=tasks,
-            verbose=mission["verbose"],
-            process=process_type[mission["process"]],
-            manager_llm=llm,
-        )
+        crew = Crew(agents=agents, tasks=tasks, process=process_type[mission["process"]])
 
         result = crew.kickoff()
         return {"result": result}
